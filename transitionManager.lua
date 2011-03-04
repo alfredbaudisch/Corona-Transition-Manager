@@ -57,6 +57,10 @@ function new()
 	end
 	
 	function transitions:cancelAll(pausing)
+		if self.goingOn <= 0 then
+			return false
+		end
+		
 		if self.paused then
 			self.paused 		= false
 			self.pausedSince 	= 0
