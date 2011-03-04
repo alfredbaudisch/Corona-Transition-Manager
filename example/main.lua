@@ -46,7 +46,7 @@ local function transitions()
 	
 	tm:add(plane3, {time = 5000, alpha = 0, rotation = 270, onComplete = function() print("Plane 3 finished") end})
 	
-	tm:add(plane4, {time = 5000, x = display.contentWidth - plane1.contentWidth * .5, onComplete = function() print("Plane 4 finished") end})
+	tm:add(plane4, {time = 2000, x = display.contentWidth - plane1.contentWidth * .5, transition = easing.inOutExpo, onComplete = function() print("Plane 4 finished") end})
 end
 
 transitions()
