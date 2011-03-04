@@ -59,8 +59,6 @@ function new()
 	function transitions:cancelAll(pausing)
 		if self.paused then
 			self.paused 		= false
-			self.goingOn 		= 0
-			self.transitionId 	= 1
 			self.pausedSince 	= 0
 		
 		else		
@@ -70,20 +68,20 @@ function new()
 					v.transition = nil
 				end
 			end			
-			
-			if pausing == nil or pausing == false then
-				self.goingOn 		= 0
-				self.transitionId 	= 1
-				
-				for i, v in pairs(self.db) do
-					v = nil
-				end
-				
-				self.db = {}
-			end
-			
-			collectgarbage()
 		end
+		
+		if pausing == nil or pausing == false then
+			self.goingOn 		= 0
+			self.transitionId 	= 1
+		
+			for i, v in pairs(self.db) do
+				v = nil
+			end
+		
+			self.db = {}
+		end
+	
+		collectgarbage()
 	end
 	
 	function transitions:pauseAll()
