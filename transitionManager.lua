@@ -7,7 +7,7 @@
 
 	@author Alfred R. Baudisch <alfred.r.baudisch@gmail.com>
  	@url http://www.karnakgames.com
-	@version 0.5b, 04/Mar/2011 
+	@version 0.6b, 09/Nov/2011 
  	@license http://creativecommons.org/licenses/by/3.0/		
 ]]--
 module(..., package.seeall)
@@ -56,12 +56,12 @@ function new()
 		self.goingOn = self.goingOn + 1	
 	end
 	
-	function transitions:cancelAll(pausing)
+	function transitions:cancelAll(pausing, ignorePaused)
 		if self.goingOn <= 0 then
 			return false
 		end
 		
-		if self.paused then
+		if self.paused and (not ignorePaused or ignorePaused == nil) then
 			self.paused 		= false
 			self.pausedSince 	= 0
 		
@@ -75,6 +75,11 @@ function new()
 		end
 		
 		if pausing == nil or pausing == false then
+			if ignorePaused then
+				self.paused 		= false
+				self.pausedSince 	= 0
+			end
+			
 			self.goingOn 		= 0
 			self.transitionId 	= 1
 		
