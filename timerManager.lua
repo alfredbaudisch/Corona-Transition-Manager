@@ -21,8 +21,26 @@ local timers = {
 	db = {}
 }
 
-function timers:add(time, callback)
-	table.insert(self.db, timer.performWithDelay(time, callback))
+function timers:add(time, callback, amount)
+	local createdTimer = timer.performWithDelay(time, callback, amount)
+	table.insert(self.db, createdTimer)
+	return createdTimer
+end
+
+function timers:pauseAll()
+	local amountTimers = #self.db
+
+	for i = 1, amountTimers do
+		if self.db[i] ~= nil then timer.pause(self.db[i]) end
+	end
+end
+
+function timers:resumeAll()
+	local amountTimers = #self.db
+
+	for i = 1, amountTimers do
+		if self.db[i] ~= nil then timer.resume(self.db[i]) end
+	end
 end
 
 function timers:cancelAll()
