@@ -25,7 +25,48 @@ function new()
 	function transitions:add(object, params)
 		local timeNow = system.getTimer()
 		local givenCallback	= params.onComplete
+		local tween
 		
+		local thisId = self.transitionId
+		
+		self.db[thisId] = {
+			object = {},
+			params = {},
+			timeStarted = 0,
+			transition = {},
+			remove = {},
+			cancel = {}
+		}
+		
+		-- Remove this transition pointers and count
+		local function removeItself(whichId)
+			local transitionId = whichId
+			
+			return function()
+				if self.db[transitionId].transition ~= nil then
+					self.db[transitionId].transition = nil
+				end
+				
+				self.db[transitionId] = nil
+				self.goingOn = self.goingOn - 1
+			end
+		end
+		
+		-- Allow to cancel this transition
+		local function cancelItself(whichId)
+			local transitionId = whichId
+			
+			return function()
+				if self.db[transitionId].transition ~= nil then
+					transition.cancel(self.db[transitionId].transition)
+					self.db[transitionId].transition = nil
+				end
+				
+				self.db[transitionId].remove()
+			end
+		end
+		
+		-- Create the callback which will call removal from object
 		local function transitionCallback(nextId)
 			local transitionId = nextId
 			local callback = givenCallback
@@ -35,25 +76,29 @@ function new()
 					callback()
 				end
 				
-				self.db[transitionId] = nil
-				self.goingOn = self.goingOn - 1
+				local remove = removeItself(transitionId)
+				remove()
 			end
 		end
 		
 		if params.alreadyAddedTransitionCallback == nil then
-			params.onComplete = transitionCallback(self.transitionId)
+			params.onComplete = transitionCallback(thisId)
 			params.alreadyAddedTransitionCallback = true
 		end
 				
-		self.db[self.transitionId] = {
+		self.db[thisId] = {
 			object = object,
 			params = params,
 			timeStarted = timeNow,
-			transition = transition.to(object, params)
+			transition = transition.to(object, params),
+			remove = removeItself(thisId),
+			cancel = cancelItself(thisId)
 		}
 		
 		self.transitionId = self.transitionId + 1	
 		self.goingOn = self.goingOn + 1	
+		
+		return self.db[thisId]
 	end
 	
 	function transitions:cancelAll(pausing, ignorePaused)
